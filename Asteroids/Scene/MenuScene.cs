@@ -29,7 +29,8 @@ namespace Asteroids
             {
                 SceneManager                // Обратимся к менеджеру сцен
                     .Get();
-                    GameForm.Draw();
+                     Game.Init(_form);
+                    Game.Draw();
                                         // Проинициализируем сцену с игрой
                    
             }

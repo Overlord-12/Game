@@ -61,7 +61,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Scene\GameForm.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Object\Asteroid.cs" />
     <Compile Include="Scene\SceneManager.cs" />
