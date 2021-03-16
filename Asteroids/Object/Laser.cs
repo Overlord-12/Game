@@ -9,6 +9,7 @@ namespace Asteroids
 {
     class Laser:BaseObject
     {
+        
         public Laser(Point pos,Point dir,Size size): base(pos, dir, size) { }
         public override void Draw()
         {
@@ -17,7 +18,8 @@ namespace Asteroids
         public override void Update()
         {
 
-            Pos.X = Pos.X + 15;    
+            Pos.X = Pos.X + 15;
+          
         }
     }
 }

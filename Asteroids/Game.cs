@@ -13,12 +13,12 @@ namespace Asteroids
     {
         private static BufferedGraphicsContext _context;
         private static BufferedGraphics _buffer;
-        private static BaseObject[] _asteroids;  
+        private static List<Asteroid> asteroids = new List<Asteroid>(); 
         private static BaseObject[] _stars;
         private static BaseObject[] _planets;
-        private static Laser _laser;
+        private static List<Laser> laser = new List<Laser>();
         private static List<Medicine> medicines = new List<Medicine>();
-        private static Medicine med;
+        private static Random random = new Random();
 
         static Ship ship = new Ship(new Point(10,400),new Point(5,5), new Size(70,70));
         static Timer timer = new Timer();
@@ -76,7 +76,10 @@ namespace Asteroids
         {
             if (e.KeyCode == Keys.Space)
             {
-                _laser = new Laser(new Point(ship.Rect.X + 10, ship.Rect.Y + 10), new Point(5, 0), new Size(40, 30));
+                if (laser.Count < 3)
+                {
+                    laser.Add(new Laser(new Point(ship.Rect.X + 10, ship.Rect.Y + 10), new Point(5, 0), new Size(40, 30)));
+                }
             }
             if(e.KeyCode == Keys.W)
             {
@@ -108,25 +111,24 @@ namespace Asteroids
             _buffer.Graphics.DrawImage(Properties.Resources.Sun1,50,50,350,300);
             ship.Draw();
 
-          
-            if (ship.Energy <= 50 && medicines.Count <= 1)
+            
+                if (ship.Energy < 50 && medicines.Count < 1)
+                {
+                    var position = new Random();
+                    var x = position.Next(0, Width / 2);
+                    var y = position.Next(0, Height / 2);
+                    medicines.Add(new Medicine(new Point(x, y), new Point(1, 1), new Size(40, 40)));            
+                }
+
+            foreach (var med in medicines)
             {
-                if (medicines != null)
-                {
-                    foreach (var med in medicines)
-                        med.Draw();
-                }
+                med.Draw();
             }
+           
 
-
-
-
-
-            foreach (var asteroid in _asteroids)
-                if (asteroid != null)
-                {
+            foreach (var asteroid in asteroids)
                     asteroid.Draw();
-                }
+               
                
 
             foreach (var star in _stars)
@@ -138,10 +140,9 @@ namespace Asteroids
 
             foreach (var planet in _planets)
                 planet.Draw();
-            if (_laser != null)
-            {
+           foreach(var _laser in laser)
                 _laser.Draw();
-            }
+           
            
             _buffer.Render();
             if (ship != null)
@@ -157,73 +158,98 @@ namespace Asteroids
 
         public static void Update()
         {
+            if (asteroids.Count < 15)
+            {
+                var size = random.Next(10, 50);
+                var location = random.Next(0, Height);
+                asteroids.Add(new Asteroid(new Point(Width-100, location), new Point(-4, -4), new Size(size, size)));
+            }
+            foreach (var med in medicines)
+            {
+                med.Draw();
+            }
 
             if (ship.Energy <=0)
             {
                 ship.Die();
             }
-            
-            for (int i = 0; i < _asteroids.Length; i++)
+           
+            for (int i = 0; i < asteroids.Count; i++)
             {
-                var asteroids = _asteroids[i];
+                var asteroid = asteroids[i];
+
+                for (int j= 0; j < laser.Count; j++)
+                {
+                    if (asteroids[i].Collision(laser[j]))
+                    {
+                        asteroids.RemoveAt(i);
+                        laser.RemoveAt(i);
+                        score += 30;
+                        continue;
+                    }
+                }
                
-                if (_asteroids[i] == null)
+                if (ship != null && asteroids[i].Collision(ship))
                 {
-                    continue;
-                }
-                _asteroids[i].Update();
-                if (_laser != null && _asteroids[i].Collision(_laser))
-                {
-                    _asteroids[i] = null;
-                    _laser = null;
-                    score += 30;
-                    continue;
-                }
-                if (ship != null && _asteroids[i].Collision(ship))
-                {
-                    _asteroids[i] = null;
+                    asteroids.RemoveAt(i);
                     ship.HP_Minus(10);
                   
                     continue;
                 }
-               
-                if (medicines != null && ship.Collision(med) && med != null)
-                {
-                    medicines.Remove(med);
-                    ship.HP_Plus(30);
-                    med = null;
-                    continue;
-                }
 
+               
+
+            }
+            foreach(var _asteroid in asteroids)
+            {
+                _asteroid.Update();
+            }
+            for (int j = 0; j < medicines.Count; j++)
+            {
+                if (ship.Collision(medicines[j]))
+                {
+                    medicines.RemoveAt(j);
+                    ship.HP_Plus(30);
+                }
             }
             //if (medicines != null && ship.Collision(medicines))
             //{
             //    medicines.Remove;
             //    ship.HP_Plus(30);
-                
+
             //}
 
             foreach (var star in _stars)
                 star.Update(); // Переопределенный метод Update
             foreach (var planets in _planets)
                 planets.Update();
-            if (_laser != null)
+            foreach (var _laser in laser)
             {
+                if ()
+                {
+
+                }
                 _laser.Update();
             }
+               
+            
            
 
         }
 
         public static void Load()
         {
-            var random = new Random();
-            _asteroids = new BaseObject[15];
-            for (int i = 0; i < _asteroids.Length; i++)
-            {
-                var size = random.Next(10, 20);
-                _asteroids[i] = new Asteroid(new Point(300, (i+1) *20), new Point(-i, -i), new Size(size, size));
-            }
+
+            //if (asteroids.Count < 15)
+            //{
+               
+            //    var size = random.Next(10,50);
+            //    asteroids.Add(new Asteroid(new Point(300, (i + 1) * 20), new Point(-i, -i), new Size(size, size)));
+            //    i++;
+            //    Game.Load();
+            //}
+
+            
             _stars = new BaseObject[10];
             for (int i = 0; i < _stars.Length; i++)
             {
@@ -236,11 +262,6 @@ namespace Asteroids
                 _planets[i] = new Planet(new Point(300, (i+1) * 100), new Point(-i, -i), new Size(size, size));
             }
   
-            var position = new Random();
-            var x = position.Next(0, Width / 2);
-            var y = position.Next(0, Height / 2);
-            med = new Medicine(new Point(x, y), new Point(1, 1), new Size(40, 40));
-            medicines.Add(med);
 
         }
 
