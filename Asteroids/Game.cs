@@ -183,8 +183,9 @@ namespace Asteroids
                     if (asteroids[i].Collision(laser[j]))
                     {
                         asteroids.RemoveAt(i);
-                        laser.RemoveAt(i);
+                        laser.RemoveAt(j);
                         score += 30;
+                        i--;
                         continue;
                     }
                 }
@@ -193,7 +194,7 @@ namespace Asteroids
                 {
                     asteroids.RemoveAt(i);
                     ship.HP_Minus(10);
-                  
+                    i--;
                     continue;
                 }
 
@@ -223,17 +224,23 @@ namespace Asteroids
                 star.Update(); // Переопределенный метод Update
             foreach (var planets in _planets)
                 planets.Update();
+
             foreach (var _laser in laser)
             {
-                if ()
-                {
-
-                }
-                _laser.Update();
-            }
                
-            
-           
+                _laser.Update();
+                
+            }
+
+            for (int i = laser.Count - 1; i >= 0; i--)
+            {
+                if (laser[i].GetPos.X > Width)
+                {
+                    laser.RemoveAt(i);
+                }
+            }
+
+
 
         }
 

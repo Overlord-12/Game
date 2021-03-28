@@ -11,6 +11,10 @@ namespace Asteroids
     {
         
         public Laser(Point pos,Point dir,Size size): base(pos, dir, size) { }
+        public Point GetPos
+        {
+            get { return Pos; }
+        }
         public override void Draw()
         {
             Game.Buffer.Graphics.DrawImage(Properties.Resources.laser, Pos.X, Pos.Y, Size.Width, Size.Height);
